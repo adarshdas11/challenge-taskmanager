@@ -1,10 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://challenge-taskmanager.onrender.com/api"; 
-// 🔥 THIS IS YOUR BACKEND (NOT -1)
-
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: "https://challenge-taskmanager.onrender.com/api", // <-- FIXED
 });
 
 api.interceptors.request.use((config) => {
@@ -15,13 +12,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// AUTH
 export const authAPI = {
   login: (data) => api.post("/auth/login/", data),
   register: (data) => api.post("/auth/register/", data),
 };
 
-// TASKS
 export const taskAPI = {
   getTasks: () => api.get("/tasks/"),
   addTask: (data) => api.post("/tasks/", data),
