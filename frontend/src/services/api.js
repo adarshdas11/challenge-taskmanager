@@ -1,28 +1,27 @@
 import axios from "axios";
 
-const API_URL = "https://challenge-taskmanager.onrender.com/api";
+const API_URL = "https://challenge-taskmanager.onrender.com/api"; 
+// 🔥 THIS IS YOUR BACKEND (NOT -1)
 
-// axios instance
 const api = axios.create({
   baseURL: API_URL,
 });
 
-// attach JWT token correctly
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");   // MAIN TOKEN
+  const token = localStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// AUTH API
+// AUTH
 export const authAPI = {
   login: (data) => api.post("/auth/login/", data),
   register: (data) => api.post("/auth/register/", data),
 };
 
-// TASK API
+// TASKS
 export const taskAPI = {
   getTasks: () => api.get("/tasks/"),
   addTask: (data) => api.post("/tasks/", data),
