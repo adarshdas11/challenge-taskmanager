@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { taskAPI } from "../services/api";
 
 export default function Dashboard() {
@@ -8,12 +9,15 @@ export default function Dashboard() {
   const [status, setStatus] = useState("pending");
   const [username, setUsername] = useState("");
 
+  // Navigation hook
+  const navigate = useNavigate();
+
   // Edit mode & modal
   const [isEditing, setIsEditing] = useState(false);
   const [editTaskId, setEditTaskId] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  // Search / filter / theme states (kept from previous enhancements)
+  // Search / filter / theme states
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all"); // all | pending | completed
@@ -60,7 +64,7 @@ export default function Dashboard() {
     localStorage.setItem("theme", isDarkMode ? "dark" : "light");
   }, [isDarkMode]);
 
-  // prevent background scroll when modal open
+  // Prevent background scroll when modal open
   useEffect(() => {
     document.body.style.overflow = showEditModal ? "hidden" : "";
     return () => {
@@ -89,7 +93,6 @@ export default function Dashboard() {
     taskAPI
       .updateTask(editTaskId, { title, description, status })
       .then(() => {
-        // close modal
         setShowEditModal(false);
         setIsEditing(false);
         setEditTaskId(null);
@@ -100,7 +103,6 @@ export default function Dashboard() {
       })
       .catch((err) => {
         console.error(err);
-        // still close gracefully so user can retry
         setShowEditModal(false);
         setIsEditing(false);
       });
@@ -114,19 +116,16 @@ export default function Dashboard() {
       .catch((err) => console.error(err));
   };
 
-  // START EDIT -> show modal with animation
+  // START EDIT
   const startEdit = (task) => {
-    // populate fields first
     setIsEditing(true);
     setEditTaskId(task.id);
     setTitle(task.title || "");
     setDescription(task.description || "");
     setStatus(task.status || "pending");
 
-    // show modal (modal handles its own animation via CSS)
     setTimeout(() => {
       setShowEditModal(true);
-      // bring to top so user can see the modal
       window.scrollTo({ top: 0, behavior: "smooth" });
     }, 20);
   };
@@ -139,15 +138,17 @@ export default function Dashboard() {
       setTitle("");
       setDescription("");
       setStatus("pending");
-    }, 220); // allow animation to finish
+    }, 220);
   };
 
+  // ✅ Updated logout using React Router
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    window.location.href = "/login";
+    localStorage.removeItem("username");
+    localStorage.removeItem("token"); // also remove fallback
+
+    navigate("/login");
   };
 
   // FILTER + SEARCH
@@ -202,7 +203,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* EDIT MODAL (centered, large) */}
+      {/* EDIT MODAL */}
       {showEditModal && (
         <div className="edit-modal-overlay" role="dialog" aria-modal="true">
           <div className="edit-modal card">
@@ -258,7 +259,7 @@ export default function Dashboard() {
 
       {/* Main dashboard layout */}
       <main className="dashboard-main">
-        {/* Form on left (for quick add) — still available when not editing */}
+        {/* Form on left */}
         <section
           className={
             "card task-form-card" + (showEditModal ? " dimmed" : "")
@@ -305,7 +306,6 @@ export default function Dashboard() {
               className="btn-outline full-width"
               style={{ marginTop: "10px" }}
               onClick={() => {
-                // cancelled inline edit
                 setIsEditing(false);
                 setEditTaskId(null);
                 setTitle("");
@@ -408,7 +408,6 @@ export default function Dashboard() {
                     </span>
                   </div>
 
-                  {/* Edit -> opens the big modal; Delete */}
                   <div style={{ display: "flex", gap: "8px" }}>
                     <button
                       className="btn-outline"
