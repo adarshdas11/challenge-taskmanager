@@ -61,6 +61,6 @@ Request body:
 ```json
 {
   "username": "adarsh",
-  "email": "adarsh@example.com",
-  "password": "yourpassword"
+  "email": "adarsh@gmail.com",
+  "password": "adarsh123"
 }
